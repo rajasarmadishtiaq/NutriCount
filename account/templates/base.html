@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{% block title %}{% endblock %}</title>
+        <link href="{% static "css/base.css" %}" rel="stylesheet">
+    </head>
+    <body>
+    <div id="header">
+        <span class="logo">NutriCount</span>
+        {% if request.user.is_authenticated %}
+            <ul class="menu">
+                <li {% if section == "dashboard" %}class="selected"{% endif %}>
+                    <a href="{% url "dashboard" %}">My Dashboard</a>
+                </li>
+                <li {% if section == "logs" %}class="selected"{% endif %}>
+                    <a href="{% url "logs" %}">My Logs</a>
+                </li>
+                <li {% if section == "network" %}class="selected"{% endif %}>
+                    <a href="#">My Network</a>
+                </li>
+            </ul>
+        {% endif %}
+        <span class="user">
+            {% if request.user.is_authenticated %}
+                    {% if profile.photo %}
+                            <img src="{{ profile.photo.url }}" alt="Profile Photo" class="profile-image">
+                    {% endif %}
+                Hello {{ request.user.first_name }},
+                <a href="{% url "logout" %}">Logout</a>
+            {% else %}
+                <a href="{% url "login" %}">Log-in</a>
+            {% endif %}
+        </span>
+    </div>
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li class="{{ message.tags }}">
+                    {{ message|safe }}
+                    <a href="#" class="close">x</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <div id="content">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <script>
+        const closeButtons = document.querySelectorAll('.close');
+
+        closeButtons.forEach((button) => {
+            button.addEventListener('click', (event) => {
+                event.preventDefault();
+                const messageElement = button.parentNode;
+                messageElement.style.display = 'none';
+            });
+
+            setTimeout(() => {
+                const messageElement = button.parentNode;
+                if (messageElement.style.display !== 'none') {
+                messageElement.style.display = 'none';
+                }
+            }, 5000);
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Add food{% endblock %}
+
+{% block content %}
+
+    <h1>Add food</h1>
+    <p>You can add food using the following search bar:</p>
+
+    <form method="POST">
+        <label for="query">Food name</label>
+        <input type="text" id="query" name="query" required>
+        {% csrf_token %}
+        <p><input type="submit" value="add"></p>
+    </form>
+
+{% endblock %}

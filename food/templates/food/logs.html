@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% load custom_filters %}
+
+{% block title %}My Logs{% endblock %}
+
+{% block content %}
+    <h1>Logs</h1>
+    <p>Welcome to your logs</p>
+    <p>Total calories consumed today {{user_metrics.calories_consumed|round_value}} kcal</p>
+    {% if profile.calorie > user_metrics.calories_consumed %}
+        <p>Calories remaining for today {{profile.calorie|subtract:user_metrics.calories_consumed}} kcal</p>
+    {% else %}
+        <p>Daily caloric goal reached!</p>
+    {% endif %}
+    <br>
+
+    <form method="POST">
+        <label for="date">Select Date</label>
+        <input type="date" id="date" name="date" value = {{ date }} required>
+        {% csrf_token %}
+        <input type="submit" value="Fetch Logs" id = "fetch">
+    </form>
+
+    <div class="button-container">
+        <a href="{% url "add_food" %}"><input type="submit" value="Add Food" class = "add"></a>
+        <a href="{% url "edit_logs" %}"><input type="submit" value="Edit Logs" id = "edit"></a>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Food Name</th>
+                <th>Serving Size (g)</th>
+                <th>Calories</th>
+                <th>Carbohydrates (g)</th>
+                <th>Protein (g)</th>
+                <th>Fats (g)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for food in saved_foods %}
+                <tr>
+                    <td>{{ food.name|capitalize }}</td>
+                    <td>{{ food.serving_size_g }}</td>
+                    <td>{{ food.calories }}</td>
+                    <td>{{ food.carbohydrates_total_g }}</td>
+                    <td>{{ food.protein_g }}</td>
+                    <td>{{ food.fat_total_g }}</td>
+                    <!--<td>{{ food.fat_total_g|multiply:9|divide:food.serving_size_g|multiply:100|floatformat:2 }}</td>-->
+                </tr>
+            {% empty %}
+                <tr>
+                  <td colspan="4">No saved foods found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <table>
+        <thead>
+            <tr>
+                <th>Total Carbohydrates Consumed (g)</th>
+                <th>Total Protein Consumed (g)</th>
+                <th>Total Fats Consumed (g)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <td>{{ macronutrients.0|round_value }}</td>
+            <td>{{ macronutrients.1|round_value }}</td>
+            <td>{{ macronutrients.2|round_value }}</td>
+        </tbody>
+    </table>
+
+{% endblock %}
