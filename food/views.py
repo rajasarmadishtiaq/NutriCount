@@ -143,7 +143,10 @@ def monthly_metrics(request):
     date = datetime.date.today()
     month, year = date.month, date.year
     total_days = calendar.monthrange(year, month)[1]
-    monthly_caloric_goal = profile.calorie * total_days
+    if profile.calorie:
+        monthly_caloric_goal = profile.calorie * total_days
+    else:
+        monthly_caloric_goal = 0
     monthly_calories_consumed = 0
 
     for days in range(1, total_days + 1):
@@ -179,8 +182,10 @@ def weekly_metrics(request):
                 user_metrics = UserMetric.objects.get(user=profile, created_at=search_date)
                 weekly_calories_consumed += user_metrics.calories_consumed
 
-    weekly_caloric_goal = profile.calorie * len(current_week)
-    print(weekly_caloric_goal, weekly_calories_consumed)
+    if profile.calorie:
+        weekly_caloric_goal = profile.calorie * len(current_week)
+    else:
+        weekly_caloric_goal = 0
     return weekly_caloric_goal, weekly_calories_consumed
 
 
