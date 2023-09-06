@@ -10,6 +10,12 @@
     <p>Welcome to your dashboard. You can <a href="{% url "edit" %}">edit your profile</a> or <a href="{% url "password_change" %}">change your password</a>.</p>
     {% if profile.calorie and profile.preference %}
         <p>You need to consume {{profile.calorie}} kcal daily for {{profile.get_preference_display}}.</p>
+        <p>Total calories consumed today {{user_metrics.calories_consumed|round_value}} kcal</p>
+        {% if profile.calorie > user_metrics.calories_consumed %}
+            <p>Calories remaining for today {{profile.calorie|subtract:user_metrics.calories_consumed}} kcal</p>
+        {% else %}
+            <p>Daily caloric goal reached!</p>
+        {% endif %}
         <p>Weekly caloric goal achieved: {{ week_metrics.1|divide:week_metrics.0|multiply:100|floatformat:2 }}%</p>
         <p>Monthly caloric goal achieved: {{ month_metrics.1|divide:month_metrics.0|multiply:100|floatformat:2 }}%</p>
     {% else %}

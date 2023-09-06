@@ -6,7 +6,8 @@ from django.contrib import messages
 from .models import Profile
 from .forms import LoginForm, UserRegistrationForm, \
                    UserEditForm, ProfileEditForm
-from food.views import monthly_metrics, weekly_metrics
+import datetime
+from food.views import monthly_metrics, weekly_metrics, track_calories
 
 
 def user_login(request):
@@ -33,13 +34,16 @@ def user_login(request):
 @login_required
 def dashboard(request):
     profile = Profile.objects.get(user=request.user)
+    date = str(datetime.date.today())
     month_metrics = monthly_metrics(request)
     week_metrics = weekly_metrics(request)
+    user_metrics = track_calories(request, profile, date)
     return render(request,
                   'account/dashboard.html',
                   {'section': 'dashboard', 'profile': profile,
                    'month_metrics': month_metrics,
-                   'week_metrics': week_metrics})
+                   'week_metrics': week_metrics,
+                   'user_metrics': user_metrics})
 
 
 def register(request):
