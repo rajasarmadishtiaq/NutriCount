@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% load custom_filters %}
+
+{% block title %}Add Mentor{% endblock %}
+
+{% block content %}
+
+    <h1>Add mentor</h1>
+    <p>You can add a mentor using the following search bar:</p>
+
+    <form method="POST">
+        <label for="query">Mentor's username</label>
+        <input type="text" id="query" name="query" required>
+        {% csrf_token %}
+        <p><input type="submit" value="add"></p>
+    </form>
+
+{% endblock %}

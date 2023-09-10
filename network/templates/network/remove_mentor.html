@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% load custom_filters %}
+
+{% block title %}Remove Mentor{% endblock %}
+
+{% block content %}
+
+    <h1>Delete mentor</h1>
+    <p>You can remove a mentor or mentee using the following search bar:</p>
+
+    <form method="POST">
+        <label for="query">Mentor or mentee's username</label>
+        <input type="text" id="query" name="query" required>
+        {% csrf_token %}
+        <p><input type="submit" value="remove" id="exit"></p>
+    </form>
+
+{% endblock %}

@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% load custom_filters %}
+
+{% block title %}View Mentee Logs{% endblock %}
+
+{% block content %}
+    <h1>{{ profile.user.first_name }} {{ profile.user.last_name }}'s Logs</h1>
+    <p>Welcome to your mentee's logs</p>
+
+    {% if profile.calorie and profile.preference %}
+        <p>{{ profile.user.first_name }} needs to consume {{profile.calorie}} kcal daily for {{profile.get_preference_display}}.</p>
+        <p>{{ profile.user.first_name }}'s weekly caloric goal achieved: {{ week_metrics.1|divide:week_metrics.0|multiply:100|floatformat:2 }}%</p>
+        <p>{{ profile.user.first_name }}'s monthly caloric goal achieved: {{ month_metrics.1|divide:month_metrics.0|multiply:100|floatformat:2 }}%</p>
+        <p>Total calories consumed today {{user_metrics.calories_consumed|round_value}} kcal</p>
+        {% if profile.calorie > user_metrics.calories_consumed %}
+            <p>Calories remaining for today {{profile.calorie|subtract:user_metrics.calories_consumed}} kcal</p>
+        {% else %}
+            <p>Daily caloric goal reached!</p>
+        {% endif %}
+    {% else %}
+        <p>Edit and complete your profile to display your caloric goals.</p>
+    {% endif %}
+
+    <form method="POST">
+        <label for="date">Select Date</label>
+        <input type="date" id="date" name="date" value = {{ date }} required>
+        {% csrf_token %}
+        <input type="submit" value="Fetch Logs" id = "fetch">
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Food Name</th>
+                <th>Serving Size (g)</th>
+                <th>Calories</th>
+                <th>Carbohydrates (g)</th>
+                <th>Protein (g)</th>
+                <th>Fats (g)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for food in saved_foods %}
+                <tr>
+                    <td>{{ food.name|capitalize }}</td>
+                    <td>{{ food.serving_size_g }}</td>
+                    <td>{{ food.calories }}</td>
+                    <td>{{ food.carbohydrates_total_g }}</td>
+                    <td>{{ food.protein_g }}</td>
+                    <td>{{ food.fat_total_g }}</td>
+                    <!--<td>{{ food.fat_total_g|multiply:9|divide:food.serving_size_g|multiply:100|floatformat:2 }}</td>-->
+                </tr>
+            {% empty %}
+                <tr>
+                  <td colspan="4">No saved foods found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <table>
+        <thead>
+            <tr>
+                <th>Total Carbohydrates Consumed (g)</th>
+                <th>Total Protein Consumed (g)</th>
+                <th>Total Fats Consumed (g)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <td>{{ macronutrients.0|round_value }}</td>
+            <td>{{ macronutrients.1|round_value }}</td>
+            <td>{{ macronutrients.2|round_value }}</td>
+        </tbody>
+    </table>
+
+{% endblock %}

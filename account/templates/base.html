@@ -17,15 +17,12 @@
                     <a href="{% url "logs" %}">My Logs</a>
                 </li>
                 <li {% if section == "network" %}class="selected"{% endif %}>
-                    <a href="#">My Network</a>
+                    <a href="{% url "network" %}">My Network</a>
                 </li>
             </ul>
         {% endif %}
         <span class="user">
             {% if request.user.is_authenticated %}
-                    {% if profile.photo %}
-                            <img src="{{ profile.photo.url }}" alt="Profile Photo" class="profile-image">
-                    {% endif %}
                 Hello {{ request.user.first_name }},
                 <a href="{% url "logout" %}">Logout</a>
             {% else %}

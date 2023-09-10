@@ -254,6 +254,13 @@ ul.messages li a.close {
     border-radius: 50%;
     margin-right: 10px;
 }
+.image-container {
+    outline: none;
+}
+.image-container:hover {
+  background-color: blue;
+  cursor: pointer;
+}
 .count {
     color:#aaa;
     border:3px solid #bbb;
@@ -324,4 +331,11 @@ img.user-detail {
 .action .date {
     font-style:italic;
     color:#ccc;
+}
+
+.profile-container {
+    display: flex;
+}
+.profile {
+    margin-right: 4%;
 }

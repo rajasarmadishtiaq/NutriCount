@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% load custom_filters %}
+
+{% block title %}My Network{% endblock %}
+
+{% block content %}
+
+    <h1>Network</h1>
+    <p>Welcome to your network</p>
+
+    <div class="button-container">
+        <a href="{% url "add_mentor" %}"><input type="submit" value="Add Mentor" class="add"></a>
+        <a href="{% url "remove_mentor_or_mentee" %}"><input type="submit" value="Remove Mentor" id="exit"></a>
+    </div>
+
+    <h1>Mentors</h1>
+    {% if mentors %}
+        <div class="profile-container">
+            {% for mentor in mentors %}
+                <div class="profile">
+                    {% if mentor.photo %}
+                        <img src="{{ mentor.photo.url }}" alt="Profile Photo" class="profile-image">
+                    {% endif %}
+                    <p>{{ mentor.user.first_name }} {{ mentor.user.last_name }}</p>
+                    <p>{{ mentor.date_of_birth }}</p>
+                    <p>{{ mentor.gender }}</p>
+                    <p>{{ mentor.age }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>Nobody in your mentors. Start by adding mentors.</p>
+    {% endif %}
+
+    <h1>Mentees</h1>
+    {% if mentees%}
+        <form method="POST">
+            {% csrf_token %}
+            <div class="profile-container">
+                {% for mentee in mentees%}
+                    <div class="profile">
+                        {% if mentee.photo %}
+                            <div class="image-container">
+                                <label>
+                                    <input type="radio" name="menteeId" value={{ mentee.id }} onclick="recordMentee({{ mentee.id }})" style="display: none;" required>
+                                    <img src="{{ mentee.photo.url }}" class="profile-image" alt="Profile Photo">
+                                </label>
+                            </div>
+                        {% endif %}
+                        <p>{{ mentee.user.first_name }} {{ mentee.user.last_name }}</p>
+                        <p>{{ mentee.date_of_birth }}</p>
+                        <p>{{ mentee.gender }}</p>
+                        <p>{{ mentee.age }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+            <br>
+            <div class="button-container">
+                <a href="{% url "view_mentee_logs" %}"><input type="submit" value="View Logs" class="add"></a>
+            </div>
+        </form>
+    {% else %}
+        <p>Nobody in your mentees. People who add you as a mentor will be displayed here.</p>
+    {% endif %}
+
+    <script>
+
+        function recordMentee(menteeId) {
+            fetch('', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ menteeId: menteeId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.writeline(data);
+            })
+            .catch(error => console.error(error));
+        }
+
+    </script>
+
+{% endblock %}

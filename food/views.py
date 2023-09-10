@@ -1,9 +1,8 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login
+from django.shortcuts import redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Profile, FoodSearch, Food, UserMetric
-from .forms import AddFood, EditFood
+from .models import FoodSearch, Food, UserMetric
+from account.models import Profile
 import requests
 from django.shortcuts import render
 from api.serializers import FoodSerializer
@@ -12,8 +11,9 @@ import calendar
 
 
 @login_required
-def logs(request):
-    profile = Profile.objects.get(user=request.user)
+def logs(request, profile=None, profile_flag=False):
+    if profile is None:
+        profile = Profile.objects.get(user=request.user)
     date = request.POST.get('date')
     if date is None:
         if request.session.get('date') is not None:
@@ -28,17 +28,28 @@ def logs(request):
         food_search = FoodSearch.objects.create(user=profile, created_at=selected_date)
         saved_foods = food_search.get_saved_foods() if food_search else []
         request.session['date'] = date
-        food_search.created_at = date
-        food_search.save()
+        # food_search.created_at = date
+        # food_search.save()
         macronutrients = calculate_macronutrients(request, profile, date, food_search)
 
     else:
         food_search = FoodSearch.objects.create(user=profile)
         saved_foods = food_search.get_saved_foods() if food_search else []
 
-    return render(request, 'food/logs.html', {'section': 'logs', 'profile': profile,
-                                              'saved_foods': saved_foods, 'date': date,
-                                              'user_metrics': user_metrics, 'macronutrients': macronutrients})
+    if profile_flag is False:
+        return render(request, 'food/logs.html', {'section': 'logs', 'profile': profile,
+                                                  'saved_foods': saved_foods, 'date': date,
+                                                  'user_metrics': user_metrics, 'macronutrients': macronutrients})
+    else:
+        month_metrics = monthly_metrics(request, profile=profile)
+        week_metrics = weekly_metrics(request, profile=profile)
+        return render(request, 'network/view_mentee_logs.html', {'profile': profile,
+                                                                 'saved_foods': saved_foods, 'date': date,
+                                                                 'user_metrics': user_metrics,
+                                                                 'macronutrients': macronutrients,
+                                                                 'month_metrics': month_metrics,
+                                                                 'week_metrics': week_metrics,
+                                                                 })
 
 
 def fetch_food_api(request, query):
@@ -138,8 +149,9 @@ def track_calories(request, profile, date):
 
 
 @login_required
-def monthly_metrics(request):
-    profile = Profile.objects.get(user=request.user)
+def monthly_metrics(request, profile=None):
+    if profile is None:
+        profile = Profile.objects.get(user=request.user)
     date = datetime.date.today()
     month, year = date.month, date.year
     total_days = calendar.monthrange(year, month)[1]
@@ -158,8 +170,9 @@ def monthly_metrics(request):
 
 
 @login_required
-def weekly_metrics(request):
-    profile = Profile.objects.get(user=request.user)
+def weekly_metrics(request, profile=None):
+    if profile is None:
+        profile = Profile.objects.get(user=request.user)
     date = datetime.date.today()
     month, year = date.month, date.year
     weeks = calendar.monthcalendar(year, month)
