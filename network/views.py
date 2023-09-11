@@ -8,26 +8,47 @@ from food.views import logs
 from django.contrib.auth.models import User
 
 
-
 @login_required
 def my_network(request):
+    profile = Profile.objects.get(user=request.user)
     if request.method == 'POST':
         menteeId = int(float(request.POST.get('menteeId')))
         request.session['menteeId'] = menteeId
-        return redirect('view_mentee_logs')
-    mentees = []
-    mentors = []
-    profile = Profile.objects.get(user=request.user)
+        network_profile = Network.objects.get(mentee=menteeId, mentor=profile)
+        if request.POST.get('Add'):
+            network_profile.request = 1
+            network_profile.save()
+            messages.success(request, 'Mentee added!')
+        elif request.POST.get('Delete'):
+            network_profile.delete()
+            messages.success(request, 'Mentee rejected!')
+        else:
+            return redirect('view_mentee_logs')
+
+    mentees_added = []
+    mentors_added = []
+    mentees_pending = []
+    mentors_pending = []
+
     network_search = NetworkSearch.objects.create(user=profile)
-    mentors_search = network_search.get_mentors() if network_search else []
-    mentees_search = network_search.get_mentees() if network_search else []
-    for mentee in mentees_search:
-        mentees.append(get_object_or_404(Profile, id=mentee.mentee_id))
-    for mentor in mentors_search:
-        mentors.append(get_object_or_404(Profile, id=mentor.mentor_id))
+    for i in range(0, 2):
+        mentors_search = network_search.get_mentors(request=i) if network_search else []
+        mentees_search = network_search.get_mentees(request=i) if network_search else []
+        for mentor in mentors_search:
+            if i == 0:
+                mentors_pending.append(get_object_or_404(Profile, id=mentor.mentor_id))
+            else:
+                mentors_added.append(get_object_or_404(Profile, id=mentor.mentor_id))
+        for mentee in mentees_search:
+            if i == 0:
+                mentees_pending.append(get_object_or_404(Profile, id=mentee.mentee_id))
+            else:
+                mentees_added.append(get_object_or_404(Profile, id=mentee.mentee_id))
+
     return render(request, 'network/my_network.html',
                   {'section': 'network', 'profile': profile,
-                   'mentors': mentors, 'mentees': mentees})
+                   'mentors_added': mentors_added, 'mentees_added': mentees_added,
+                   'mentors_pending': mentors_pending, 'mentees_pending': mentees_pending})
 
 
 @login_required
@@ -47,11 +68,11 @@ def add_mentor(request):
             return redirect('network')
 
         if Network.objects.filter(mentee=mentee_profile, mentor=mentor_profile).exists():
-            messages.error(request, 'Mentor already added!')
+            messages.error(request, 'Mentor already added or request pending!')
         else:
-            network_object = Network.objects.create(mentee=mentee_profile, mentor=mentor_profile)
+            network_object = Network.objects.create(mentee=mentee_profile, mentor=mentor_profile, request=0)
             network_object.save()
-            messages.success(request, 'Mentor successfully added!')
+            messages.success(request, 'Mentor request sent!')
             return redirect('network')
     return render(request, 'network/add_mentor.html')
 

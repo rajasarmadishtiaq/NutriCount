@@ -8,21 +8,75 @@
 
     <h1>Network</h1>
     <p>Welcome to your network</p>
+    <p>Use the below buttons to add a mentor or remove a mentor/mentee</p>
 
     <div class="button-container">
-        <a href="{% url "add_mentor" %}"><input type="submit" value="Add Mentor" class="add"></a>
-        <a href="{% url "remove_mentor_or_mentee" %}"><input type="submit" value="Remove Mentor" id="exit"></a>
+        <a href="{% url "add_mentor" %}"><input type="submit" value="Add" class="add"></a>
+        <a href="{% url "remove_mentor_or_mentee" %}"><input type="submit" value="Remove" id="exit"></a>
     </div>
 
-    <h1>Mentors</h1>
-    {% if mentors %}
+    <h1>Mentor Requests Sent</h1>
+    {% if mentors_pending %}
         <div class="profile-container">
-            {% for mentor in mentors %}
+            {% for mentor in mentors_pending %}
                 <div class="profile">
                     {% if mentor.photo %}
                         <img src="{{ mentor.photo.url }}" alt="Profile Photo" class="profile-image">
                     {% endif %}
                     <p>{{ mentor.user.first_name }} {{ mentor.user.last_name }}</p>
+                    <p>{{ mentor.user.username }}</p>
+                    <p>{{ mentor.date_of_birth }}</p>
+                    <p>{{ mentor.gender }}</p>
+                    <p>{{ mentor.age }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No mentor requests sent.</p>
+    {% endif %}
+
+    <h1>Mentee Requests Pending</h1>
+        {% if mentees_pending %}
+            <form method="POST">
+                {% csrf_token %}
+                <div class="profile-container">
+                    {% for mentee in mentees_pending %}
+                        <div class="profile">
+                            {% if mentee.photo %}
+                                <div class="image-container">
+                                        <label>
+                                            <input type="radio" name="menteeId" value={{ mentee.id }} onclick="editRequest({{ mentee.id }})" style="display: none;" required>
+                                            <img src="{{ mentee.photo.url }}" class="profile-image" alt="Profile Photo">
+                                        </label>
+                                    </div>
+                            {% endif %}
+                            <p>{{ mentee.user.first_name }} {{ mentee.user.last_name }}</p>
+                            <p>{{ mentee.user.username }}</p>
+                            <p>{{ mentee.date_of_birth }}</p>
+                            <p>{{ mentee.gender }}</p>
+                            <p>{{ mentee.age }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="button-container">
+                    <input type="submit" name="Add" value="Add Mentee" class="add">
+                    <input type="submit" name="Delete" value="Reject Request" id="delete">
+                </div>
+            </form>
+        {% else %}
+            <p>No mentee requests sent.</p>
+        {% endif %}
+
+    <h1>Mentors Added</h1>
+    {% if mentors_added %}
+        <div class="profile-container">
+            {% for mentor in mentors_added %}
+                <div class="profile">
+                    {% if mentor.photo %}
+                        <img src="{{ mentor.photo.url }}" alt="Profile Photo" class="profile-image">
+                    {% endif %}
+                    <p>{{ mentor.user.first_name }} {{ mentor.user.last_name }}</p>
+                    <p>{{ mentor.user.username }}</p>
                     <p>{{ mentor.date_of_birth }}</p>
                     <p>{{ mentor.gender }}</p>
                     <p>{{ mentor.age }}</p>
@@ -33,12 +87,12 @@
         <p>Nobody in your mentors. Start by adding mentors.</p>
     {% endif %}
 
-    <h1>Mentees</h1>
-    {% if mentees%}
+    <h1>Mentees Added</h1>
+    {% if mentees_added %}
         <form method="POST">
             {% csrf_token %}
             <div class="profile-container">
-                {% for mentee in mentees%}
+                {% for mentee in mentees_added %}
                     <div class="profile">
                         {% if mentee.photo %}
                             <div class="image-container">
@@ -49,6 +103,7 @@
                             </div>
                         {% endif %}
                         <p>{{ mentee.user.first_name }} {{ mentee.user.last_name }}</p>
+                        <p>{{ mentee.user.username }}</p>
                         <p>{{ mentee.date_of_birth }}</p>
                         <p>{{ mentee.gender }}</p>
                         <p>{{ mentee.age }}</p>
@@ -65,6 +120,34 @@
     {% endif %}
 
     <script>
+
+        const addMenteeButton = document.querySelector('.add');
+        const deleteButton = document.querySelector('#delete');
+
+        function editRequest(menteeId){
+
+            addMenteeButton.addEventListener('click', function() {
+                addMenteeButton.clicked = true;
+            });
+
+            deleteButton.addEventListener('click', function() {
+                deleteButton.clicked = true;
+            });
+
+            fetch('', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ menteeId: menteeId, add: isAdd, delete: isDelete })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.writeline(data);
+            })
+            .catch(error => console.error(error));
+        }
 
         function recordMentee(menteeId) {
             fetch('', {
