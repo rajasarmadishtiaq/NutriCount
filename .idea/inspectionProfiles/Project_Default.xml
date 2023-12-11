@@ -1,0 +1,32 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="HtmlUnknownAttribute" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myValues">
+        <value>
+          <list size="1">
+            <item index="0" class="java.lang.String" itemvalue="static" />
+          </list>
+        </value>
+      </option>
+      <option name="myCustomValuesEnabled" value="true" />
+    </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="readings" />
+          <option value="returns" />
+          <option value="year" />
+          <option value="year_index" />
+          <option value="avg_max_temp" />
+          <option value="current_month" />
+          <option value="prev_month" />
+          <option value="avg_min_temp" />
+          <option value="day" />
+          <option value="avg_max_humidity" />
+          <option value="days" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>

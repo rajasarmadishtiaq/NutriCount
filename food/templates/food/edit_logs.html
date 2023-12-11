@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% load custom_filters %}
+
+{% block title %}Edit Logs{% endblock %}
+
+{% block content %}
+    <h1>Edit Logs</h1>
+    <p>Edit your logs</p>
+    <br>
+
+    <form method="POST">
+        {% csrf_token %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Food Name</th>
+                    <th>Serving Size (g)</th>
+                    <th>Select Food</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for food in saved_foods %}
+                    <tr>
+                        <td>{{ food.name|capitalize }}</td>
+                        <td>{{ food.serving_size_g }}</td>
+                        <td><input type="radio" name="food_id" value={{ food.id }} onclick="recordEntry({{ food.id }})" required></td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                      <td colspan="4">No saved foods found.</td>
+                    </tr>
+                {% endfor %}
+                <tr><td><input type="number" name="serving_size_g" id="serving_size_g" placeholder="Enter new serving size"></td></tr>
+            </tbody>
+        </table>
+        <div class="button-container">
+            <input type="submit" value="Confirm" class = "add">
+            <input type="submit" name="Delete" value="Delete" id = "delete">
+            <input type="submit" value="Exit" id = "exit" onclick="redirect(event)">
+        </div>
+    </form>
+
+    <script>
+
+        const deleteButton = document.querySelector('#delete');
+
+        function redirect(event) {
+            event.preventDefault();
+            window.location.href = "/logs/";
+        }
+
+        function recordEntry(foodId) {
+            const servingSizeInput = document.querySelector('input[name="serving_size_g"]');
+
+            deleteButton.addEventListener('click', function() {
+                deleteButton.clicked = true;
+            });
+
+            servingSizeInput.addEventListener('change', function(event) {
+                const servingSizeValue = event.target.value;
+                serving_size_g=servingSizeValue
+                });
+            fetch('', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ food_id: foodId, serving_size_g: serving_size_g, delete: isDelete })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.writeline(data);
+            })
+            .catch(error => console.error(error));
+        }
+    </script>
+
+{% endblock %}
