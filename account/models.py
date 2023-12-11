@@ -29,7 +29,7 @@ GENDERS = [
 class Profile(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     date_of_birth = models.DateField(blank=True, null=True)
-    photo = models.ImageField(upload_to='users/%Y/%m/%d/', blank=True, null=True)
+    photo = models.ImageField(upload_to='users/%Y/%m/%d/', blank=True, null=True, default='default/default.png')
     weight = models.FloatField('Weight in kg', validators=[MinValueValidator(30), MaxValueValidator(300)], blank=True, null=True)
     height = models.FloatField('Height in cm', validators=[MinValueValidator(55), MaxValueValidator(250)], blank=True, null=True)
     exercise = models.FloatField(max_length=50, choices=EXERCISE_CHOICES, blank=True, null=True)
