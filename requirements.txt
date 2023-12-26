@@ -1,0 +1,5 @@
+django==5.0
+gunicorn
+djangorestframework
+django-extensions
+social-auth-app-django
