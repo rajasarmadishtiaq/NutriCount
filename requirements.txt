@@ -3,3 +3,5 @@ gunicorn
 djangorestframework
 django-extensions
 social-auth-app-django
+whitenoise
+Pillow
