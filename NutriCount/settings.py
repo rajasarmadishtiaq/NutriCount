@@ -26,7 +26,7 @@ SECRET_KEY = 'generate_key'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['mysite.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['mysite.com', 'localhost', '127.0.0.1', 'nutricount-61be5dd74691.herokuapp.com]
 
 
 # Application definition
